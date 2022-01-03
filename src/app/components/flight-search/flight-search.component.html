@@ -1,0 +1,16 @@
+
+    <h1><strong>Find flight deals around the world</strong></h1>
+
+    <hr>
+
+    <form (ngSubmit)="onSubmit()">
+
+            <div>
+                <label for=""><h3>From where:</h3></label>
+                <input type="text" class="form-control" name="from" [(ngModel)]="from" (keyup)="handleFromLocation()">
+                {{ from }}
+            </div>
+
+    
+    </form>
+    
