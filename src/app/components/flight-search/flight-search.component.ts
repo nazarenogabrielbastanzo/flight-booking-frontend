@@ -9,6 +9,22 @@ import { Component, OnInit } from '@angular/core';
 export class FlightSearchComponent implements OnInit {
 
   from: any = "";
+  fromLocation: any = [];
+  origin: any;
+  fromLocationTemplate: boolean = true;
+
+  to: any = "";
+  toLocation: any = [];
+  destination: any;
+  toLocationTemplate: boolean = false;
+
+  date: any = "";
+  departureDateTemplate: boolean = false
+
+  flights: any;
+  flightTemplate: boolean = false
+
+  booked: boolean = false
 
 
   constructor() { }
@@ -17,13 +33,122 @@ export class FlightSearchComponent implements OnInit {
   }  
     
     
-  onSubmit() {
-    console.log("form submitted");
+  onFindFlight() {
+    
+    if (this.date == "") {
+      alert("Please choose a date")
+    } else {
+      const data = { originCode: this.origin.iataCode, destinationCode: this.destination.iataCode, dateOfDeparture: this.date };
+
+    fetch('http://localhost:5000/flight-search', {
+      method: 'POST', 
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(data => {
+
+      this.flights = data.data
+      this.departureDateTemplate = false
+      this.flightTemplate = true
+    })
+    .catch((error) => {
+
+      alert(error)
+    });
+    }
+    
+  }
+
+  onBookFlight(flight: any) {
+
+    const data = { flight: flight };
+   
+
+    fetch('http://localhost:5000/flight-confirmation', {
+      method: 'POST', 
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => response.json())
+    .then(dataObject => {
+      console.log('Success:', dataObject.data.flightOffers);
+
+      const data = { flight: flight };
+
+      console.log(data);
+      
+
+      fetch('http://localhost:5000/flight-booking', {
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.json())
+      .then(data => {
+
+        console.log('Success:', data);
+        
+
+        this.booked  = true;
+        this.flightTemplate = false
+        this.flights = []
+      })
+      .catch((error) => {
+
+        alert(error)
+      });
+
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+      alert(error)
+    });
+    
     
   }
 
   handleFromLocation() {
+
+    if (this.from.length > 3) {
+      fetch(`http://localhost:5000/city-and-airport-search/${this.from}`)
+      .then(response => response.json())
+      .then(data => this.fromLocation = data.data)      
+    }       
     
   }
+
+  handleOrigin(location: any) {
+    this.origin = location;
+    this.fromLocationTemplate = false;    
+    this.toLocationTemplate = true; 
+    this.fromLocation = [];    
+  }
+
+  handleToLocation() {
+
+    if (this.to.length > 3) {
+      fetch(`http://localhost:5000/city-and-airport-search/${this.to}`)
+      .then(response => response.json())
+      .then(data => this.toLocation = data.data)      
+    }       
+    
+  }
+
+  handleDestination(location: any) {
+    this.destination = location;
+    this.toLocationTemplate = false;    
+    this.toLocation = []
+    this.departureDateTemplate = true;
+    
+  }
+
+
 
 }
