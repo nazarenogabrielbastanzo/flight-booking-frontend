@@ -23,7 +23,7 @@
             <div *ngIf="toLocationTemplate">
                 <label for=""><h3>To where:</h3></label>
                 <input type="text" class="form-control" name="to" [(ngModel)]="to" (keypress)="handleToLocation()">
-                <small>City or Airport search E.g. London</small>
+                <small>City or Airport search E.g. New york</small>
     
                 <div class="card mb-3 mt-3" *ngFor="let Location of toLocation" (click)="handleDestination(Location)">
                     <div class="card-header"><b>Name:</b> {{ Location.name }}</div>
@@ -61,6 +61,20 @@
                     Number of Seats Available: {{ flight.numberOfBookableSeats }}
                     <br>
                     Last Ticketing Date: {{ flight.lastTicketingDate }}
+                    <hr>                   
+                    <h5>Itineraries</h5>
+                    Duration: {{ flight.itineraries[0].duration }}
+
+                    <p *ngFor="let i of flight.itineraries[0].segments">
+                        <strong>Departure:</strong> {{ i.departure.iataCode }} <strong>at</strong> {{ i.departure.at }}
+                        <em>(Terminal: {{ i.departure.terminal }})</em>
+                        &nbsp;
+                        <strong>Arrival:</strong> {{ i.arrival.iataCode }} <strong>at</strong> {{ i.arrival.at }}
+                        <em>(Terminal: {{ i.arrival.terminal }})</em>
+                        &nbsp;
+                        <strong>Number of stops:</strong> {{ i.numberOfStops }}                        
+                    </p>                    
+
                     <hr>
 
                     <h5>Enter your details:</h5>
