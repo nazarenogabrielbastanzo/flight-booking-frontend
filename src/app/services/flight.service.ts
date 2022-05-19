@@ -14,23 +14,23 @@ export class FlightService {
     });
   }
 
-  searchCityAndAirport(
+  searchCityAndAirport<T>(
     location: string,
     activateHeaders: boolean
-  ): Observable<any> {
-    return this.http.get<any>(
+  ): Observable<T> {
+    return this.http.get<T>(
       `http://localhost:5000/city-and-airport-search/${location}`,
       activateHeaders ? { headers: this._headers } : {}
     );
   }
 
-  findFlight(
+  findFlight<T>(
     originCode: string,
     destinationCode: string,
     dateOfDeparture: string,
     activateHeaders: boolean
-  ): Observable<any> {
-    return this.http.get<any>(
+  ): Observable<T> {
+    return this.http.get<T>(
       `http://localhost:5000/flight-search?originCode=${originCode}&destinationCode=${destinationCode}&dateOfDeparture=${dateOfDeparture}`,
       activateHeaders ? { headers: this._headers } : {}
     );

@@ -37,7 +37,7 @@ export class FlightSearchComponent implements OnInit {
   ngOnInit(): void {}
 
   handleFromLocation() {
-    this.flightSvc.searchCityAndAirport(this.from, false)
+    this.flightSvc.searchCityAndAirport<ILocation[]>(this.from, false)
       .pipe(
         debounceTime(2000),
         tap((res: any) => {
@@ -51,7 +51,7 @@ export class FlightSearchComponent implements OnInit {
       });
   }
 
-  handleOrigin(location: any) {
+  handleOrigin(location: ILocation) {
     console.log(location);
 
     this.origin = location;
@@ -61,7 +61,7 @@ export class FlightSearchComponent implements OnInit {
   }
 
   handleToLocation() {
-    this.flightSvc.searchCityAndAirport(this.to, false)
+    this.flightSvc.searchCityAndAirport<ILocation[]>(this.to, false)
       .pipe(
         debounceTime(2000),
         tap((res: any) => {
@@ -75,7 +75,7 @@ export class FlightSearchComponent implements OnInit {
       });
   }
 
-  handleDestination(location: any) {
+  handleDestination(location: ILocation) {
     console.log(location);
 
     this.destination = location;
@@ -89,7 +89,7 @@ export class FlightSearchComponent implements OnInit {
       alert('Please choose a date');
     } else {
 
-      this.flightSvc.findFlight(this.origin.iataCode, this.destination.iataCode, this.date, true)
+      this.flightSvc.findFlight<Flight[]>(this.origin.iataCode, this.destination.iataCode, this.date, true)
         .pipe(
           debounceTime(2000),
           tap((res: any) => {
@@ -111,18 +111,18 @@ export class FlightSearchComponent implements OnInit {
     }
   }
 
-  onBookFlight(flight: any) {
+  onBookFlight(flight: Flight) {
     if (this.first == '' && this.last == '') {
       alert('Enter your first and last name');
       return;
     }
 
-    const data = { flight: flight };
+    const data = { flight };
     const name = {
       first: this.first,
       last: this.last,
     };
-    const dataForBookingFlight = { flight: flight, name: name };
+    const dataForBookingFlight = { flight, name };
 
     fetch('http://localhost:5000/flight-confirmation', {
       method: 'POST',
@@ -135,7 +135,7 @@ export class FlightSearchComponent implements OnInit {
       .then((dataObject) => {
         console.log('Success:', dataObject.data.flightOffers);
 
-        const data = { flight: flight };
+        const data = { flight };
 
         console.log(data);
 
