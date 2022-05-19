@@ -32,7 +32,7 @@ export class FlightSearchComponent implements OnInit {
   first: string = '';
   last: string = '';
 
-  constructor(private http: HttpClient, private flightSvc: FlightService) {}
+  constructor(private flightSvc: FlightService) {}
 
   ngOnInit(): void {}
 
