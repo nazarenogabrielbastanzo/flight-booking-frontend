@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { debounceTime, tap } from 'rxjs';
 import { Flight } from '../../interfaces/flight.interface';
 import { ILocation } from '../../interfaces/location.interface';
+import { FlightService } from '../../services/flight.service';
 
 @Component({
   selector: 'app-flight-search',
@@ -20,7 +21,7 @@ export class FlightSearchComponent implements OnInit {
   destination!: ILocation;
   toLocationTemplate: boolean = false;
 
-  date!: Date;
+  date!: string;
   departureDateTemplate: boolean = false;
 
   flights!: Flight[];
@@ -31,13 +32,12 @@ export class FlightSearchComponent implements OnInit {
   first: string = '';
   last: string = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private flightSvc: FlightService) {}
 
   ngOnInit(): void {}
 
   handleFromLocation() {
-    this.http
-      .get<any>(`http://localhost:5000/city-and-airport-search/${this.from}`)
+    this.flightSvc.searchCityAndAirport(this.from, false)
       .pipe(
         debounceTime(2000),
         tap((res: any) => {
@@ -61,7 +61,7 @@ export class FlightSearchComponent implements OnInit {
   }
 
   handleToLocation() {
-    this.http.get<any>(`http://localhost:5000/city-and-airport-search/${this.to}`)
+    this.flightSvc.searchCityAndAirport(this.to, false)
       .pipe(
         debounceTime(2000),
         tap((res: any) => {
@@ -89,7 +89,7 @@ export class FlightSearchComponent implements OnInit {
       alert('Please choose a date');
     } else {
 
-      this.http.get<any>(`http://localhost:5000/flight-search?originCode=${this.origin.iataCode}&destinationCode=${this.destination.iataCode}&dateOfDeparture=${this.date}`)
+      this.flightSvc.findFlight(this.origin.iataCode, this.destination.iataCode, this.date, true)
         .pipe(
           debounceTime(2000),
           tap((res: any) => {
@@ -107,27 +107,7 @@ export class FlightSearchComponent implements OnInit {
             console.log(error);
 
           }
-        })
-
-      /* fetch(
-        `http://localhost:5000/flight-search?originCode=${this.origin.iataCode}&destinationCode=${this.destination.iataCode}&dateOfDeparture=${this.date}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          this.flights = data.data;
-          console.log(this.flights);
-          this.departureDateTemplate = false;
-          this.flightTemplate = true;
-        })
-        .catch((error) => {
-          alert(error);
-        }); */
+        });
     }
   }
 
