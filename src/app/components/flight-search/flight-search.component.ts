@@ -1,6 +1,5 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { debounceTime, tap } from 'rxjs';
+import { debounceTime, map, mergeMap, of, tap, zip } from 'rxjs';
 import { Flight } from '../../interfaces/flight.interface';
 import { ILocation } from '../../interfaces/location.interface';
 import { FlightService } from '../../services/flight.service';
@@ -124,43 +123,19 @@ export class FlightSearchComponent implements OnInit {
     };
     const dataForBookingFlight = { flight, name };
 
-    fetch('http://localhost:5000/flight-confirmation', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((dataObject) => {
-        console.log('Success:', dataObject.data.flightOffers);
-
-        const data = { flight };
-
-        console.log(data);
-
-        fetch('http://localhost:5000/flight-booking', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(dataForBookingFlight),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            console.log('Success:', data);
-
-            this.booked = true;
-            this.flightTemplate = false;
-            this.flights = [];
-          })
-          .catch((error) => {
-            alert(error);
-          });
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-        alert(error);
-      });
+    this.flightSvc.confirmFlight(JSON.stringify(data), true)
+      .pipe(
+        tap((res: any) => {
+          console.log('Success:', res.data.flightOffers);
+        }),
+        mergeMap((res: any) => zip(of(res), this.flightSvc.bookFlight(JSON.stringify(dataForBookingFlight), true))),
+        map((res: any) => {
+          console.log(res);
+          this.booked = true;
+          this.flightTemplate = false;
+          this.flights = [];
+        }),
+      )
+      .subscribe();
   }
 }

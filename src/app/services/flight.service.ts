@@ -35,4 +35,13 @@ export class FlightService {
       activateHeaders ? { headers: this._headers } : {}
     );
   }
+
+  confirmFlight<T>(data: string, activateHeaders: boolean): Observable<T> {
+    return this.http.post<T>(`http://localhost:5000/flight-confirmation`, data, activateHeaders ? { headers: this._headers } : {});
+  }
+
+  bookFlight<T>(data: string, activateHeaders: boolean): Observable<T> {
+    return this.http.post<T>(`http://localhost:5000/flight-booking`, data, activateHeaders ? { headers: this._headers } : {});
+  }
+
 }
